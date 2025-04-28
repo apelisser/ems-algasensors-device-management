@@ -26,4 +26,12 @@ public class Sensor {
     private String model;
     private Boolean enabled;
 
+    public void enable() {
+        this.enabled = true;
+    }
+
+    public void disable() {
+        this.enabled = false;
+    }
+
 }

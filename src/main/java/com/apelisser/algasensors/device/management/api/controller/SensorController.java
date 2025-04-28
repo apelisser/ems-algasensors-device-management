@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -81,6 +80,22 @@ public class SensorController {
     public void delete(@PathVariable TSID sensorId) {
         Sensor sensor = findSensorOrFail(sensorId);
         sensorRepository.delete(sensor);
+    }
+
+    @PutMapping("/{sensorId}/enable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void enable(@PathVariable TSID sensorId) {
+        Sensor sensor = findSensorOrFail(sensorId);
+        sensor.enable();
+        sensorRepository.save(sensor);
+    }
+
+    @DeleteMapping("/{sensorId}/disable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void disable(@PathVariable TSID sensorId) {
+        Sensor sensor = findSensorOrFail(sensorId);
+        sensor.disable();
+        sensorRepository.save(sensor);
     }
 
     private Sensor findSensorOrFail(TSID sensorId) {
