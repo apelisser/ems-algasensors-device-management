@@ -1,5 +1,6 @@
 package com.apelisser.algasensors.device.management.api.controller;
 
+import com.apelisser.algasensors.device.management.api.client.SensorMonitoringClient;
 import com.apelisser.algasensors.device.management.api.model.SensorInput;
 import com.apelisser.algasensors.device.management.api.model.SensorOutput;
 import com.apelisser.algasensors.device.management.common.IdGenerator;
@@ -29,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class SensorController {
 
     private final SensorRepository sensorRepository;
+    private final SensorMonitoringClient sensorMonitoringClient;
 
     @GetMapping
     public Page<SensorOutput> search(@PageableDefault Pageable pageable) {
@@ -80,6 +82,8 @@ public class SensorController {
     public void delete(@PathVariable TSID sensorId) {
         Sensor sensor = findSensorOrFail(sensorId);
         sensorRepository.delete(sensor);
+
+        sensorMonitoringClient.disableMonitoring(sensorId);
     }
 
     @PutMapping("/{sensorId}/enable")
@@ -88,14 +92,18 @@ public class SensorController {
         Sensor sensor = findSensorOrFail(sensorId);
         sensor.enable();
         sensorRepository.save(sensor);
+
+        sensorMonitoringClient.enableMonitoring(sensorId);
     }
 
-    @DeleteMapping("/{sensorId}/disable")
+    @DeleteMapping("/{sensorId}/enable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void disable(@PathVariable TSID sensorId) {
         Sensor sensor = findSensorOrFail(sensorId);
         sensor.disable();
         sensorRepository.save(sensor);
+
+        sensorMonitoringClient.disableMonitoring(sensorId);
     }
 
     private Sensor findSensorOrFail(TSID sensorId) {
