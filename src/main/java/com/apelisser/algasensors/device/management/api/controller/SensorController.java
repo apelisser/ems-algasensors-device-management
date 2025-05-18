@@ -1,7 +1,9 @@
 package com.apelisser.algasensors.device.management.api.controller;
 
 import com.apelisser.algasensors.device.management.api.client.SensorMonitoringClient;
+import com.apelisser.algasensors.device.management.api.model.SensorDetailOutput;
 import com.apelisser.algasensors.device.management.api.model.SensorInput;
+import com.apelisser.algasensors.device.management.api.model.SensorMonitoringOutput;
 import com.apelisser.algasensors.device.management.api.model.SensorOutput;
 import com.apelisser.algasensors.device.management.common.IdGenerator;
 import com.apelisser.algasensors.device.management.domain.model.Sensor;
@@ -38,11 +40,23 @@ public class SensorController {
         return sensors.map(this::convertToModel);
     }
 
-    @GetMapping("{sensorId}")
+    @GetMapping("/{sensorId}")
     public SensorOutput getOne(@PathVariable TSID sensorId) {
         Sensor sensor = findSensorOrFail(sensorId);
 
         return convertToModel(sensor);
+    }
+
+    @GetMapping("/{sensorId}/detail")
+    public SensorDetailOutput getOneWithDetail(@PathVariable TSID sensorId) {
+        Sensor sensor = findSensorOrFail(sensorId);
+        SensorMonitoringOutput monitoringOutput = sensorMonitoringClient.getDetail(sensorId);
+        SensorOutput sensorOutput = convertToModel(sensor);
+
+        return SensorDetailOutput.builder()
+            .monitoring(monitoringOutput)
+            .sensor(sensorOutput)
+            .build();
     }
 
     @PostMapping
